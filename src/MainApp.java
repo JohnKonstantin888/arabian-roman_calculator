@@ -1,77 +1,68 @@
 import java.util.Scanner;
 
 public class MainApp {
-    private static Converter converter = new Converter();
-
     public static void main(String[] args) {
-        System.out.println("Введите выражение в формате n+n без пробелов");
+        Converter converter = new Converter();
+        String[] operations = {"+", "-", "/", "*"};
+        String[] regexOperations = {"\\+", "-", "/", "\\*"};
+        System.out.println("Введите выражение: ");
         Scanner console = new Scanner(System.in);
         String request = console.nextLine();
-        System.out.println(calc(request));
-
-    }
-
-    public static String calc(String input) {
-        String[] array = input.split("[+\\-*/]");
-        boolean isRoman = false;
-        String result = "";
-        int firstNumber;
-        int secondNumber;
-        if (array.length != 2) {
-            throw new RuntimeException("Введите 2 положительных, целых числа, и операнд для выполнения операции");
-        }
-        if (input.contains("[IVX]")) {
-            isRoman = true;
-        }
-        if (isRoman) {
-            firstNumber = Integer.parseInt(array[0]);
-            secondNumber = Integer.parseInt(array[1]);
-            result = String.valueOf(calculation(firstNumber, secondNumber, getOperation(input)));
-        } else {
-            firstNumber = converter.toArabian(array[0]);
-            secondNumber = converter.toArabian(array[1]);
-            int temp = calculation(firstNumber, secondNumber, getOperation(input));
-            result = converter.toRoman(temp);
-        }
-        return result;
-    }
-
-    public static String getOperation(String input) {
-        if (input.contains("+")) {
-            return "+";
-        } else if (input.contains("-")) {
-            return "-";
-        } else if (input.contains("*")) {
-            return "*";
-        } else if (input.contains("/")) {
-            return "/";
-        } else {
-            return null;
-        }
-    }
-
-
-    public static int calculation(int firstNumber, int secondNumber, String operation) {
-        int result;
-        if (firstNumber > 10 || firstNumber < 0 || secondNumber > 10 || secondNumber < 0) {
-            throw new RuntimeException("Числа должны находиться в промежутке от 1 до 10 включительно");
-        } else {
-            switch (operation) {
-                case "+" :
-                    result = firstNumber + secondNumber;
-                    return result;
-                case "-":
-                    result = firstNumber - secondNumber;
-                    return result;
-                case "*":
-                    result = firstNumber * secondNumber;
-                    return result;
-                case "/" :
-                    result = firstNumber / secondNumber;
-                    return result;
-                default:
-                    throw new RuntimeException("Неверная операция");
+        //Определяем арифметическое действие:
+        int operationIndex=-1;
+        for (int i = 0; i < operations.length; i++) {
+            if(request.contains(operations[i])){
+                operationIndex = i;
+                break;
             }
+        }
+        //Если не нашли арифметического действия, завершаем программу
+        if(operationIndex==-1){
+            System.out.println("Некорректное выражение");
+            return;
+        }
+        //Делим строчку по найденному арифметическому знаку
+        String[] data = request.split(regexOperations[operationIndex]);
+        //Определяем, находятся ли числа в одном формате (оба римские или оба арабские)
+        if(converter.isRoman(data[0]) == converter.isRoman(data[1])){
+            int a,b;
+            //Определяем, римские ли это числа
+            boolean isRoman = converter.isRoman(data[0]);
+            if(isRoman) {
+                //если римские, то конвертируем их в арабские
+                a = converter.romanToInt(data[0]);
+                b = converter.romanToInt(data[1]);
+            } else {
+                //если арабские, конвертируем их из строки в число
+                a = Integer.parseInt(data[0]);
+                b = Integer.parseInt(data[1]);
+            }
+            //выполняем с числами арифметическое действие
+            int result;
+            switch (operations[operationIndex]) {
+                case "+":
+                    result = a + b;
+                    break;
+                case "-":
+                    result = a - b;
+                    break;
+                case "*":
+                    result = a * b;
+                    break;
+                default:
+                    result = a / b;
+                    break;
+            }
+            //15->XV
+            if(isRoman) {
+                //если числа были римские, возвращаем результат в римском числе
+                System.out.println(converter.intToRoman(result));
+            } else {
+                //если числа были арабские, возвращаем результат в арабском числе
+                System.out.println(result);
+            }
+        } else {
+            System.out.println("Числа должны быть в одном формате");
         }
     }
 }

@@ -1,34 +1,16 @@
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeMap;
 
 public class Converter {
-    Map<Character, Integer> romanKeyMap = new HashMap<>();
+    TreeMap<Character, Integer> romanKeyMap = new TreeMap<>();
     TreeMap<Integer, String> arabianKeyMap = new TreeMap<>();
-    public int toArabian(String number) {
+
+    public Converter() {
         romanKeyMap.put('I', 1);
         romanKeyMap.put('V', 5);
         romanKeyMap.put('X', 10);
         romanKeyMap.put('L', 50);
         romanKeyMap.put('C', 100);
 
-        int end = number.length() - 1;
-        char[] array = number.toCharArray();
-        int arabian;
-        int result = romanKeyMap.get(array[end]);
-        for (int i = end - 1; i >= 0; i--) {
-            arabian = romanKeyMap.get(array[i]);
-
-            if (arabian < romanKeyMap.get(array[i + 1])) {
-                result -= arabian;
-            } else {
-                result += arabian;
-            }
-        }
-        return result;
-    }
-
-    public String toRoman(int number) {
         arabianKeyMap.put(100, "C");
         arabianKeyMap.put(90, "XC");
         arabianKeyMap.put(50, "L");
@@ -38,7 +20,13 @@ public class Converter {
         arabianKeyMap.put(5, "V");
         arabianKeyMap.put(4, "IV");
         arabianKeyMap.put(1, "I");
+    }
 
+    public boolean isRoman(String number) {
+        return romanKeyMap.containsKey(number.charAt(0));
+    }
+
+    public String intToRoman(int number) {
         String roman = "";
         int arabianKey;
         do {
@@ -49,4 +37,20 @@ public class Converter {
         return roman;
     }
 
+    public int romanToInt(String roman) {
+        int endIndex = roman.length() - 1;
+        char[] array = roman.toCharArray();
+        int arabian;
+        int result = romanKeyMap.get(array[endIndex]);
+        for (int i = endIndex - 1; i >= 0; i--) {
+            arabian = romanKeyMap.get(array[i]);
+
+            if (arabian < romanKeyMap.get(array[i + 1])) {
+                result -= arabian;
+            } else {
+                result += arabian;
+            }
+        }
+        return result;
+    }
 }
